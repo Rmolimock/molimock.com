@@ -1,0 +1,146 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Control the TV</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }} ">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+
+
+
+            function selectViewer() {
+                $('#viewer-selection').css('display', 'flex')
+            }
+
+            function closeSelection() {
+                $('#viewer-selection').css('display', 'none')
+            }
+
+            function togglePower(viewer) {
+                if ($('#tvOff').css('display') == 'block') {
+                    // turn tv on
+                    $('#tvOn').css('display', 'block')
+                    $('#tvOff').css('display', 'none')
+                    var data = {'viewer': viewer, 'action': 'on'};
+                    var controller = sendAndFillData('/power', data, '#controller')
+                }
+                else {
+                    // turn tv off
+                    $('#tvOff').css('display', 'block');
+                    $('#tvOn').css('display', 'none');
+                    var data = {'viewer': viewer, 'action': 'off'}
+                    var res = sendAndFillData('/power', data, '#controller')
+                }
+                closeSelection();
+            }
+
+            function getTvStatus() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/tv',
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function(data) {
+                        if (data['tv_status'] == 'off') {
+                            // only show tv off
+                            $('#tvOff').css('display', 'block');
+                            $('#tvOn').css('display', 'none');
+                        }
+                        else {
+                            // only show tv on
+                            $('#tvOn').css('display', 'block');
+                            $('#tvOff').css('display', 'none');
+                        }
+                        $('#controller').text(data['controller']);
+                    },
+                    error: function(data) {
+                        alert(data);
+                    }
+                });
+            }
+            getTvStatus()
+            
+
+            function sendAndFillData(route, data=null, fill=null) {
+                
+                $.ajax({
+                    type: 'POST',
+                    url: route,
+
+                    data: JSON.stringify(data),
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function(data) {
+                        if (fill) {
+                            $(fill).text(data);
+                        }
+                    },
+                    error: function(data) {
+                        alert(data);
+                    }
+                });
+
+            };
+        </script>
+
+</head>
+
+<body>
+
+  <header id="header">
+    <h1><span id="controller"> No one </span> has control of the TV </h1>
+  </header>
+
+  <main>
+
+    <aside id="viewer-selection" style="display: none">
+        <h1>Who are you?</h1>
+        <div class="selection" id="joe" onclick="togglePower('Joe')">
+            JOE
+        </div>
+        <div class="selection" id="russ" onclick="togglePower('Russ')">
+            RUSS
+        </div>
+        <div class="selection" id="other" onclick="togglePower('Guest')">
+            GUEST
+        </div>
+        <div class="selection" id="cancel" onclick="closeSelection()">
+            CANCEL
+        </div>
+    </aside>
+
+    <section id="tv-container" class="container">
+      <!--
+        1. power button
+        2. who has control
+        3. identity input
+        4. 
+
+
+      -->tap the TV to turn it on/off
+      <img id="tvOn" style="display: none" src="https://i.imgur.com/Lf0Twl0.png" onclick=selectViewer()>
+      <img id="tvOff" style="display: block" src="https://i.imgur.com/Wg568gC.png" onclick="selectViewer()">
+      
+
+      
+    </section>
+
+    <section id="rules-container" class="container">
+      <header>
+        <h2>TV Control Rules:</h2>
+      </header>
+      <p id="rules-desc">
+        <b>You have control of the TV if:</b><br>
+        You turned it on less than an hour ago.<br><br>
+        <b>You do NOT have control of the TV if:</b><br>
+        1. You turned it on over an hour ago.<br>
+        2. You turned it off.<br><br>
+        <b>You can gain control of the TV if:</b><br>
+        No one currently has control and you turn it on (must turn it off and on if it's already on).<br>
+      </p>
+    </section>
+  </main>
+
+</body>
+</html>
