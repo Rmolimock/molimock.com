@@ -2,12 +2,12 @@
 TV Control Game API endoints
 """
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from games.api import tv_api
 from models import db
 
 
-@tv_api.route('/', methods=['GET'], strict_slashes=False)
+@tv_api.route('', methods=['GET'], strict_slashes=False)
 def api():
     return jsonify({'status': 'OK'})
 
@@ -64,7 +64,7 @@ def power():
 
     return controller
 
-@tv_api.route('/tv', methods=['GET'])
+@tv_api.route('/tv_status', methods=['GET'])
 def tv():
     """ check if tv is on and who has control """
     from datetime import datetime, timedelta

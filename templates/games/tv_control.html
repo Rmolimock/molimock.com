@@ -25,14 +25,14 @@
                     $('#tvOn').css('display', 'block')
                     $('#tvOff').css('display', 'none')
                     var data = {'viewer': viewer, 'action': 'on'};
-                    var controller = sendAndFillData('/power', data, '#controller')
+                    var controller = sendAndFillData('/games/tv/api/power', data, '#controller')
                 }
                 else {
                     // turn tv off
                     $('#tvOff').css('display', 'block');
                     $('#tvOn').css('display', 'none');
                     var data = {'viewer': viewer, 'action': 'off'}
-                    var res = sendAndFillData('/power', data, '#controller')
+                    var res = sendAndFillData('/games/tv/api/power', data, '#controller')
                 }
                 closeSelection();
             }
@@ -40,7 +40,7 @@
             function getTvStatus() {
                 $.ajax({
                     type: 'GET',
-                    url: '/tv',
+                    url: '/games/tv/api/tv_status',
                     contentType: 'application/json;charset=UTF-8',
                     success: function(data) {
                         if (data['tv_status'] == 'off') {
